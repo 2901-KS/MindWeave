@@ -1,53 +1,280 @@
-quiz
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MINDMAPGENIE</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* General Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f7fb; color: #333; }
+
+    /* Navbar */
+    nav { display: flex; justify-content: space-between; align-items: center; background: #4a6cf7; padding: 1rem 2rem; color: #fff; }
+    nav .logo { font-size: 1.5rem; font-weight: bold; }
+    nav .nav-links a { margin: 0 1rem; text-decoration: none; color: #fff; font-weight: 500; }
+    nav .nav-links a:hover { text-decoration: underline; }
+
+    /* Sections (Tools Pages) */
+    .section { max-width: 700px; margin: 3rem auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; }
+    .section h2 { color: #4a6cf7; margin-bottom: 1rem; }
+    .upload-box { display: block; margin: 1.5rem auto; padding: 2rem; border: 2px dashed #4a6cf7; border-radius: 10px; background: #f0f4ff; cursor: pointer; transition: 0.3s; }
+    .upload-box:hover { background: #e3eaff; }
+    .upload-box.has-file { background: #e8f5e9; border-color: #4caf50; }
+    .file-info { margin-top: 10px; color: #2e7d32; font-weight: bold; }
+    .action { background: #4a6cf7; color: #fff; padding: 0.75rem 1.5rem; border: none; border-radius: 5px; cursor: pointer; margin-top: 1rem; }
+    .action:disabled { opacity: 0.5; cursor: not-allowed; }
+    .output { margin-top: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 5px; min-height: 50px; }
+
+    /* Quiz Specific Styles */
+    .quiz-container { text-align: left; background: #fff; padding: 1.5rem; border-radius: 8px; }
+    .question-header { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.9rem; color: #666; }
+    .question-number { background: #4a6cf7; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-weight: bold; }
+    .question-text { font-size: 1.1rem; font-weight: 500; margin-bottom: 1.5rem; color: #333; }
+    .options { display: flex; flex-direction: column; gap: 0.8rem; }
+    .option-btn { width: 100%; padding: 1rem; background: #f0f4ff; border: 2px solid #d0d9ff; border-radius: 5px; text-align: left; font-size: 1rem; cursor: pointer; transition: all 0.2s; color: #333; }
+    .option-btn:hover:not(.correct):not(.incorrect):not(:disabled) { border-color: #4a6cf7; background: #e3eaff; }
+    .option-btn.correct { background: #4caf50; color: white; border-color: #4caf50; font-weight: bold; }
+    .option-btn.incorrect { background: #f44336; color: white; border-color: #f44336; }
+    .option-btn:disabled { cursor: not-allowed; }
+    .feedback { margin-top: 1.5rem; padding: 1rem; border-radius: 5px; font-weight: bold; text-align: center; }
+    .feedback.correct { background: #e8f5e9; color: #2e7d32; }
+    .feedback.incorrect { background: #ffebee; color: #c62828; }
+    .nav-buttons { display: flex; gap: 1rem; margin-top: 1.5rem; }
+    .nav-btn { flex: 1; padding: 0.75rem; border: none; border-radius: 5px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .nav-btn.prev { background: #e0e0e0; color: #666; }
+    .nav-btn.next { background: #4a6cf7; color: white; }
+    .nav-btn:hover:not(:disabled) { opacity: 0.9; }
+    .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .score-summary { text-align: center; padding: 2rem; background: #4a6cf7; color: white; border-radius: 8px; }
+    .score-summary h3 { font-size: 1.8rem; margin-bottom: 1rem; }
+    .score-summary .score { font-size: 2.5rem; font-weight: bold; margin: 1rem 0; }
+    .restart-btn { background: white; color: #4a6cf7; padding: 0.75rem 1.5rem; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 1rem; }
+    .loading { text-align: center; padding: 2rem; color: #4a6cf7; }
+    .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #4a6cf7; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 1rem auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
   <nav>
     <div class="logo">MINDWEAVE</div>
     <div class="nav-links">
+      <a href="index.html">HOME</a>
       <a href="dictionary.html">EXPLAINIT</a>
       <a href="summarizer.html">NOTESYNTH</a>
       <a href="flashcards.html">FLASHFORGE+</a>
       <a href="quiz.html">MINDMAPGENIE</a>
-      <a href="planner.html">PLANNER</a>
+      <a href="esc.html">PLANNER</a>
     </div>
-    <button class="login-btn">Login</button>
   </nav>
 
   <section class="section">
     <h2>MINDMAPGENIE</h2>
     <p>Upload PDFs and auto-generate quizzes for practice.</p>
-    <label class="upload-box">
-      <input type="file" style="display:none">
+    <label class="upload-box" id="uploadBox">
+      <input type="file" accept=".pdf" id="fileInput" style="display:none">
       📂 Click or Drop PDF here
+      <div class="file-info" id="fileInfo" style="display:none;"></div>
     </label>
-    <button class="action">Start Quiz</button>
-    <div class="output">Quiz will appear here.</div>
+    <button class="action" id="startBtn" disabled>Start Quiz</button>
+    <div class="output" id="output"></div>
   </section>
+
 <script>
-  document.querySelector(".action").addEventListener("click", async () => {
-    const file = document.querySelector("input[type=file]").files[0];
-    let formData = new FormData();
-    formData.append("pdf", file);
+  let quizData = [];
+  let currentQuestion = 0;
+  let score = 0;
+  let answered = false;
+  let userAnswers = [];
 
-    let res = await fetch("http://localhost:8000/api/quiz", {
-      method: "POST",
-      body: formData
-    });
-    let data = await res.json();
+  const fileInput = document.getElementById('fileInput');
+  const uploadBox = document.getElementById('uploadBox');
+  const fileInfo = document.getElementById('fileInfo');
+  const startBtn = document.getElementById('startBtn');
+  const output = document.getElementById('output');
 
-    let out = "";
-    data.quiz.forEach((q, i) => {
-      out += `${i+1}. ${q.question}\nOptions: ${q.options.join(", ")}\nAnswer: ${q.options[q.correctAnswer]}\n\n`;
-    });
-    document.querySelector(".output").innerText = out;
+  // File upload handling
+  fileInput.addEventListener('change', handleFileSelect);
+  
+  uploadBox.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadBox.style.background = '#e3eaff';
   });
+
+  uploadBox.addEventListener('dragleave', () => {
+    uploadBox.style.background = '#f0f4ff';
+  });
+
+  uploadBox.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === 'application/pdf') {
+      fileInput.files = e.dataTransfer.files;
+      handleFileSelect();
+    }
+  });
+
+  function handleFileSelect() {
+    const file = fileInput.files[0];
+    if (file) {
+      uploadBox.classList.add('has-file');
+      fileInfo.style.display = 'block';
+      fileInfo.innerHTML = `✓ ${file.name} uploaded successfully!`;
+      startBtn.disabled = false;
+    }
+  }
+
+  // Start quiz
+  startBtn.addEventListener('click', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    output.innerHTML = '<div class="loading"><div class="spinner"></div>Generating your quiz...</div>';
+    startBtn.disabled = true;
+
+    try {
+      let formData = new FormData();
+      formData.append("pdf", file);
+
+      let res = await fetch("http://localhost:8000/api/quiz", {
+        method: "POST",
+        body: formData
+      });
+      let data = await res.json();
+
+      quizData = data.quiz;
+      currentQuestion = 0;
+      score = 0;
+      userAnswers = new Array(quizData.length).fill(null);
+      displayQuestion();
+    } catch (error) {
+      output.innerHTML = '<div class="feedback incorrect">Error generating quiz. Please try again.</div>';
+      startBtn.disabled = false;
+    }
+  });
+
+  function displayQuestion() {
+    if (currentQuestion >= quizData.length) {
+      showResults();
+      return;
+    }
+
+    answered = false;
+    const q = quizData[currentQuestion];
+    
+    let html = `
+      <div class="quiz-container">
+        <div class="question-header">
+          <span class="question-number">Question ${currentQuestion + 1}</span>
+          <span>${currentQuestion + 1} of ${quizData.length}</span>
+        </div>
+        <div class="question-text">${q.question}</div>
+        <div class="options">
+    `;
+
+    q.options.forEach((option, index) => {
+      const isSelected = userAnswers[currentQuestion] === index;
+      const isCorrect = index === q.correctAnswer;
+      let btnClass = 'option-btn';
+      
+      if (isSelected && answered) {
+        btnClass += isCorrect ? ' correct' : ' incorrect';
+      } else if (answered && isCorrect) {
+        btnClass += ' correct';
+      }
+
+      html += `
+        <button class="option-btn ${btnClass}" 
+                onclick="selectAnswer(${index})" 
+                ${answered ? 'disabled' : ''}>
+          ${String.fromCharCode(65 + index)}. ${option}
+        </button>
+      `;
+    });
+
+    html += '</div>';
+
+    if (answered) {
+      const isCorrect = userAnswers[currentQuestion] === q.correctAnswer;
+      html += `
+        <div class="feedback ${isCorrect ? 'correct' : 'incorrect'}">
+          ${isCorrect ? '🎉 Congratulations! Correct answer!' : '❌ Incorrect. The correct answer is highlighted above.'}
+        </div>
+      `;
+    }
+
+    html += `
+      <div class="nav-buttons">
+        <button class="nav-btn prev" onclick="prevQuestion()" ${currentQuestion === 0 ? 'disabled' : ''}>
+          ← Previous
+        </button>
+        <button class="nav-btn next" onclick="nextQuestion()" ${!answered && userAnswers[currentQuestion] === null ? 'disabled' : ''}>
+          ${currentQuestion === quizData.length - 1 ? 'Finish Quiz' : 'Next →'}
+        </button>
+      </div>
+    </div>
+    `;
+
+    output.innerHTML = html;
+  }
+
+  function selectAnswer(index) {
+    if (answered) return;
+    
+    userAnswers[currentQuestion] = index;
+    answered = true;
+    
+    if (index === quizData[currentQuestion].correctAnswer) {
+      score++;
+    }
+    
+    displayQuestion();
+  }
+
+  function nextQuestion() {
+    currentQuestion++;
+    displayQuestion();
+  }
+
+  function prevQuestion() {
+    if (currentQuestion > 0) {
+      currentQuestion--;
+      answered = userAnswers[currentQuestion] !== null;
+      displayQuestion();
+    }
+  }
+
+  function showResults() {
+    const percentage = Math.round((score / quizData.length) * 100);
+    let message = '';
+    
+    if (percentage >= 90) message = '🏆 Outstanding! You\'re a quiz master!';
+    else if (percentage >= 70) message = '🌟 Great job! Well done!';
+    else if (percentage >= 50) message = '👍 Good effort! Keep practicing!';
+    else message = '💪 Keep learning! You\'ll do better next time!';
+
+    output.innerHTML = `
+      <div class="score-summary">
+        <h3>${message}</h3>
+        <div class="score">${score} / ${quizData.length}</div>
+        <p style="font-size: 1.2rem; margin: 0.5rem 0;">Score: ${percentage}%</p>
+        <button class="restart-btn" onclick="restartQuiz()">Take Another Quiz</button>
+      </div>
+    `;
+  }
+
+  function restartQuiz() {
+    quizData = [];
+    currentQuestion = 0;
+    score = 0;
+    userAnswers = [];
+    output.innerHTML = '';
+    uploadBox.classList.remove('has-file');
+    fileInfo.style.display = 'none';
+    fileInput.value = '';
+    startBtn.disabled = true;
+    uploadBox.innerHTML = '📂 Click or Drop PDF here<div class="file-info" id="fileInfo" style="display:none;"></div>';
+  }
 </script>
 </body>
 </html>
