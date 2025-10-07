@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Planner - Schedule</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Your Study Plan</h1>
+            <div class="header-actions">
+                <button onclick="window.location.href='esc.html'" class="btn-secondary">← Back to Input</button>
+                <button onclick="window.print()" class="btn-secondary">Print Plan</button>
+            </div>
+        </div>
+
+        <div id="summaryCards" class="summary-cards"></div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('all')">All Plans</button>
+            <button class="tab" onclick="showTab('progress')">Study Progress</button>
+            <button class="tab" onclick="showTab('subject')">Study Plan by Subject</button>
+        </div>
+
+        <div id="scheduleContainer" class="schedule-container"></div>
+    </div>
+
+    <script src="planner.js"></script>
+</body>
+</html>

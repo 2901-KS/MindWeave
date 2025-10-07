@@ -1,0 +1,53 @@
+quiz
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINDMAPGENIE</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <div class="logo">MINDWEAVE</div>
+    <div class="nav-links">
+      <a href="dictionary.html">EXPLAINIT</a>
+      <a href="summarizer.html">NOTESYNTH</a>
+      <a href="flashcards.html">FLASHFORGE+</a>
+      <a href="quiz.html">MINDMAPGENIE</a>
+      <a href="planner.html">PLANNER</a>
+    </div>
+    <button class="login-btn">Login</button>
+  </nav>
+
+  <section class="section">
+    <h2>MINDMAPGENIE</h2>
+    <p>Upload PDFs and auto-generate quizzes for practice.</p>
+    <label class="upload-box">
+      <input type="file" style="display:none">
+      📂 Click or Drop PDF here
+    </label>
+    <button class="action">Start Quiz</button>
+    <div class="output">Quiz will appear here.</div>
+  </section>
+<script>
+  document.querySelector(".action").addEventListener("click", async () => {
+    const file = document.querySelector("input[type=file]").files[0];
+    let formData = new FormData();
+    formData.append("pdf", file);
+
+    let res = await fetch("http://localhost:8000/api/quiz", {
+      method: "POST",
+      body: formData
+    });
+    let data = await res.json();
+
+    let out = "";
+    data.quiz.forEach((q, i) => {
+      out += `${i+1}. ${q.question}\nOptions: ${q.options.join(", ")}\nAnswer: ${q.options[q.correctAnswer]}\n\n`;
+    });
+    document.querySelector(".output").innerText = out;
+  });
+</script>
+</body>
+</html>

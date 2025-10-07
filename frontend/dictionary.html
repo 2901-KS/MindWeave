@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EXPLAINIT</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <div class="logo">MINDWEAVE</div>
+    <div class="nav-links">
+      <a href="dictionary.html">EXPLAINIT</a>
+      <a href="summarizer.html">NOTESYNTH</a>
+      <a href="flashcards.html">FLASHFORGE+</a>
+      <a href="quiz.html">MINDMAPGENIE</a>
+      <a href="planner.html">PLANNER</a>
+    </div>
+    <button class="login-btn">Login</button>
+  </nav>
+
+  <section class="section">
+    <h2>EXPLAINIT</h2>
+    <p>Type any topic to get instant AI-powered explanations.</p>
+    <input type="text" placeholder="Enter a topic...">
+    <button class="action">Explain</button>
+    <button class="action">More Details</button>
+    <div class="output">Result will appear here.</div>
+  </section>
+  <script>
+  document.querySelectorAll(".action")[0].addEventListener("click", async () => {
+    const topic = document.querySelector("input").value;
+    let res = await fetch("http://localhost:8000/api/explain", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ topic })
+    });
+    let data = await res.json();
+    document.querySelector(".output").innerText = data.explanation;
+  });
+
+  document.querySelectorAll(".action")[1].addEventListener("click", async () => {
+    const topic = document.querySelector("input").value;
+    let res = await fetch("http://localhost:8000/api/explain/detailed", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ topic })
+    });
+    let data = await res.json();
+    document.querySelector(".output").innerText = data.explanation;
+  });
+</script>
+</body>
+</html>

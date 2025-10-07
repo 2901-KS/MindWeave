@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Planner - Input</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Study Planner</h1>
+            <p class="subtitle">Plan your study schedule efficiently</p>
+        </div>
+
+        <form id="studyForm" class="form-card">
+            <div class="form-section">
+                <h2>Study Hours Configuration</h2>
+                
+                <div class="form-group">
+                    <label for="weekdayHours">Weekday study hours per day</label>
+                    <input type="number" id="weekdayHours" min="1" max="24" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="weekendHours">Weekend study hours per day</label>
+                    <input type="number" id="weekendHours" min="1" max="24" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="timeSlot">Preferred time slot</label>
+                    <select id="timeSlot" required>
+                        <option value="">Select time slot</option>
+                        <option value="morning">Morning</option>
+                        <option value="evening">Evening</option>
+                        <option value="afternoon">Afternoon</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="maxHours">Maximum study hours per day you can handle</label>
+                    <input type="number" id="maxHours" min="1" max="24" required>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-header">
+                    <h2>Subjects/Topics</h2>
+                    <button type="button" id="addSubject" class="btn-secondary">+ Add Subject</button>
+                </div>
+
+                <div id="subjectsContainer">
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <h3>Subject 1</h3>
+                            <button type="button" class="btn-remove" onclick="removeSubject(this)">Remove</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Subject name</label>
+                            <input type="text" class="subject-name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Importance level</label>
+                            <select class="subject-importance" required>
+                                <option value="">Select importance</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Deadline (YYYY-MM-DD)</label>
+                            <input type="date" class="subject-deadline" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Minimum study time (hours)</label>
+                            <input type="number" class="subject-hours" min="1" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">Generate Study Plan</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+<nav>
+    <div class="logo">MINDWEAVE</div>
+    <div class="nav-links">
+      <a href="dictionary.html">EXPLAINIT</a>
+      <a href="summarizer.html">NOTESYNTH</a>
+      <a href="flashcards.html">FLASHFORGE+</a>
+      <a href="quiz.html">MINDMAPGENIE</a>
+      <a href="esc.html">PLANNER</a>
+    </div>
+    <button class="login-btn">Login</button>
+  </nav>
+</html>
