@@ -3,8 +3,160 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EXPLAINIT</title>
-  <link rel="stylesheet" href="style.css">
+  <title>EXPLAINIT - MINDWEAVE</title>
+  <style>
+    /* General Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f7fb; color: #333; }
+
+    /* Navbar */
+    nav { display: flex; justify-content: space-between; align-items: center; background: #4a6cf7; padding: 1rem 2rem; color: #fff; }
+    nav .logo { font-size: 1.5rem; font-weight: bold; }
+    nav .nav-links a { margin: 0 1rem; text-decoration: none; color: #fff; font-weight: 500; }
+    nav .nav-links a:hover { text-decoration: underline; }
+
+    /* Section */
+    .section { max-width: 700px; margin: 3rem auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; }
+    .section h2 { color: #4a6cf7; margin-bottom: 1rem; }
+    .section > p { color: #666; margin-bottom: 1.5rem; }
+
+    /* Input */
+    input { 
+      width: 100%; 
+      padding: 0.75rem; 
+      font-size: 1rem; 
+      border: 2px solid #ddd; 
+      border-radius: 5px; 
+      margin-bottom: 1rem;
+      transition: border-color 0.3s;
+    }
+    input:focus { 
+      outline: none; 
+      border-color: #4a6cf7; 
+    }
+
+    /* Button Group */
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Action Buttons */
+    .action { 
+      flex: 1;
+      background: #4a6cf7; 
+      color: #fff; 
+      padding: 0.75rem 1.5rem; 
+      border: none; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+    .action:hover {
+      background: #3a5cd7;
+    }
+    .action:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Output */
+    .output { 
+      margin-top: 2rem; 
+      padding: 1.5rem; 
+      background: #f9f9f9; 
+      border-radius: 5px; 
+      min-height: 200px;
+      text-align: left;
+      line-height: 1.8;
+    }
+
+    .output.empty {
+      color: #999;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .output.loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Formatted Output Styles */
+    .output h3 {
+      color: #4a6cf7;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .output h3:first-child {
+      margin-top: 0;
+    }
+
+    .output p {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    .output ul, .output ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .output li {
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .output strong {
+      color: #4a6cf7;
+      font-weight: 600;
+    }
+
+    .output code {
+      background: #e8f0fe;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #1967d2;
+      font-size: 0.9rem;
+    }
+
+    .output em {
+      font-style: italic;
+      color: #555;
+    }
+
+    /* Loader */
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #4a6cf7;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Error Message */
+    .error-message {
+      color: #d32f2f;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
   <nav>
@@ -22,33 +174,112 @@
   <section class="section">
     <h2>EXPLAINIT</h2>
     <p>Type any topic to get instant AI-powered explanations.</p>
-    <input type="text" placeholder="Enter a topic...">
-    <button class="action">Explain</button>
-    <button class="action">More Details</button>
-    <div class="output">Result will appear here.</div>
+    <input type="text" placeholder="Enter a topic..." id="topicInput">
+    <div class="button-group">
+      <button class="action" id="explainBtn">Explain</button>
+      <button class="action" id="detailBtn">More Details</button>
+    </div>
+    <div class="output empty">Result will appear here.</div>
   </section>
-  <script>
-  document.querySelectorAll(".action")[0].addEventListener("click", async () => {
-    const topic = document.querySelector("input").value;
-    let res = await fetch("http://localhost:8000/api/explain", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ topic })
-    });
-    let data = await res.json();
-    document.querySelector(".output").innerText = data.explanation;
-  });
 
-  document.querySelectorAll(".action")[1].addEventListener("click", async () => {
-    const topic = document.querySelector("input").value;
-    let res = await fetch("http://localhost:8000/api/explain/detailed", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ topic })
+  <script>
+    const input = document.getElementById("topicInput");
+    const output = document.querySelector(".output");
+    const explainBtn = document.getElementById("explainBtn");
+    const detailBtn = document.getElementById("detailBtn");
+
+    // Convert markdown-like text to HTML
+    function formatText(text) {
+      // Replace **bold** with <strong>
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      
+      // Replace *italic* with <em>
+      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      
+      // Replace # Headers with h3
+      text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+      text = text.replace(/^## (.*$)/gim, '<h3>$1</h3>');
+      text = text.replace(/^# (.*$)/gim, '<h3>$1</h3>');
+      
+      // Replace `code` with <code>
+      text = text.replace(/`(.*?)`/g, '<code>$1</code>');
+      
+      // Replace bullet points with ul/li
+      text = text.replace(/^\* (.*$)/gim, '<li>$1</li>');
+      text = text.replace(/^- (.*$)/gim, '<li>$1</li>');
+      
+      // Wrap consecutive <li> items in <ul>
+      text = text.replace(/(<li>.*?<\/li>\n?)+/gs, '<ul>$&</ul>');
+      
+      // Replace numbered lists
+      text = text.replace(/^\d+\. (.*$)/gim, '<li>$1</li>');
+      text = text.replace(/(<li>.*?<\/li>\n?)+/gs, function(match) {
+        if (match.includes('<ul>')) return match;
+        return '<ol>' + match + '</ol>';
+      });
+      
+      // Replace line breaks with paragraphs
+      text = text.split('\n\n').map(para => {
+        para = para.trim();
+        if (!para) return '';
+        if (para.startsWith('<h3>') || para.startsWith('<ul>') || para.startsWith('<ol>')) {
+          return para;
+        }
+        return '<p>' + para.replace(/\n/g, '<br>') + '</p>';
+      }).join('');
+      
+      return text;
+    }
+
+    async function handleExplain(isDetailed) {
+      const topic = input.value.trim();
+      
+      if (!topic) {
+        output.className = "output empty";
+        output.textContent = "Please enter a topic first!";
+        return;
+      }
+
+      // Show loading state
+      output.className = "output loading";
+      output.innerHTML = '<div class="loader"></div>';
+      explainBtn.disabled = true;
+      detailBtn.disabled = true;
+
+      try {
+        const endpoint = isDetailed ? "/api/explain/detailed" : "/api/explain";
+        const res = await fetch(`http://localhost:8000${endpoint}`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ topic })
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch explanation");
+
+        const data = await res.json();
+        
+        // Format and display the result
+        output.className = "output";
+        output.innerHTML = formatText(data.explanation);
+        
+      } catch (error) {
+        output.className = "output";
+        output.innerHTML = `<p class="error-message"><strong>Error:</strong> ${error.message}</p>`;
+      } finally {
+        explainBtn.disabled = false;
+        detailBtn.disabled = false;
+      }
+    }
+
+    explainBtn.addEventListener("click", () => handleExplain(false));
+    detailBtn.addEventListener("click", () => handleExplain(true));
+    
+    // Allow Enter key to trigger explanation
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        handleExplain(false);
+      }
     });
-    let data = await res.json();
-    document.querySelector(".output").innerText = data.explanation;
-  });
-</script>
+  </script>
 </body>
 </html>

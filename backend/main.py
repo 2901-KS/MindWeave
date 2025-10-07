@@ -227,7 +227,7 @@ async def summarize_pdf(pdf: UploadFile = File(...)):
         if not pdf_text.strip():
             raise HTTPException(status_code=400, detail="No text in PDF")
         pdf_text = pdf_text[:15000]
-        system_instruction = "You are an expert at creating concise summaries. Focus on key points."
+        system_instruction = "You are an expert at creating concise summaries. Focus on key points.Make sure they are complete points"
         prompt = f"Summarize this text concisely:\n\n{pdf_text}"
         summary = await call_groq(prompt, system_instruction)
         return {"summary": summary}
@@ -247,7 +247,7 @@ async def generate_flashcards(pdf: UploadFile = File(...)):
         if not pdf_text.strip():
             raise HTTPException(status_code=400, detail="No text in PDF")
         pdf_text = pdf_text[:15000]
-        prompt = f"""Create exactly 10 flashcards from this text.
+        prompt = f"""Create exactly 10-15 flashcards from this text only taking the important texts.
 Return ONLY a JSON array in this format:
 [{{"question": "What is X?", "answer": "X is..."}}]
 
