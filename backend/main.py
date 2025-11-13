@@ -30,7 +30,7 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Initialize Groq
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "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"
 if not GROQ_API_KEY:
     print("⚠ WARNING: GROQ_API_KEY not found!")
 else:
